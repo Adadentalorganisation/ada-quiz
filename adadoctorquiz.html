@@ -104,7 +104,6 @@ body{font-family:Arial,sans-serif;background:#F1F5F9;color:#0F172A;min-height:10
 
 @media(max-width:500px){.stats{grid-template-columns:repeat(2,1fr)}.breakdown{grid-template-columns:1fr}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 <div class="hdr">
@@ -889,8 +888,6 @@ function startGate() {
   DR.email = email;
   saveDR();
 
-  try { emailjs.init(EJS_KEY); } catch(e) { console.log("EmailJS init:", e); }
-
   // Update header
   var hdr = document.getElementById("hdr-right");
   if (hdr) hdr.textContent = name;
@@ -913,26 +910,6 @@ function allScoresText() {
   return rows;
 }
 
-function sendEmail(toEmail, subj, sectionName, score, result, counts) {
-  try {
-    var ts = new Date().toLocaleString("en-US", {
-      weekday:"long", year:"numeric", month:"long",
-      day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"
-    });
-    emailjs.send(EJS_SVC, EJS_TPL, {
-      to_email:       toEmail,
-      doctor_name:    DR.name,
-      doctor_email:   DR.email,
-      section_name:   sectionName,
-      section_score:  score + "%",
-      section_result: result,
-      correct_count:  counts,
-      all_scores:     allScoresText(),
-      timestamp:      ts,
-      subject:        subj
-    });
-  } catch(e) { console.log("Email error:", e); }
-}
 
 function emailSectionResult(sectionLabel, correct, total, score, passed) {
   var result = passed ? "PASSED" : "FAILED - Retake required";
@@ -967,7 +944,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Check if returning user
   if (loadDR() && DR.name && DR.email) {
-    try { emailjs.init(EJS_KEY); } catch(e) {}
     var hdr = document.getElementById("hdr-right");
     if (hdr) hdr.textContent = DR.name;
     showScreen("s-welcome");
@@ -978,5 +954,117 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
+</body>
+</html><script>
+var FORMSPREE = "https://formspree.io/f/xgorbzwz";
+var ADMIN     = "jay@media.dental";
+var DR        = { name:"", email:"" };
+
+function loadDR() {
+  try {
+    var d = JSON.parse(localStorage.getItem("ada_dr_v1"));
+    if (d && d.name && d.email) { DR = d; return true; }
+  } catch(e) {}
+  return false;
+}
+
+function saveDR() {
+  try { localStorage.setItem("ada_dr_v1", JSON.stringify(DR)); } catch(e) {}
+}
+
+function startGate() {
+  var name  = (document.getElementById("g-name").value  || "").trim();
+  var email = (document.getElementById("g-email").value || "").trim().toLowerCase();
+  var err   = document.getElementById("gate-err");
+  if (!name) {
+    err.textContent = "Please enter your full name.";
+    err.style.display = "block"; return;
+  }
+  if (!email || email.indexOf("@") === -1) {
+    err.textContent = "Please enter a valid email address.";
+    err.style.display = "block"; return;
+  }
+  err.style.display = "none";
+  DR.name = name; DR.email = email;
+  saveDR();
+  var hdr = document.getElementById("hdr-right");
+  if (hdr) hdr.textContent = name;
+  showScreen("s-welcome");
+  renderWelcome();
+  setTimeout(function() { beginOrResume(); }, 200);
+}
+
+function allScoresText() {
+  var rows = "";
+  SECTIONS.forEach(function(sec) {
+    var r = STATE.sectionResults[sec.id];
+    rows += r
+      ? sec.label + ": " + r.correct + "/" + r.total + " (" + r.score + "%) - " + (r.passed ? "PASSED" : "FAILED") + "\n"
+      : sec.label + ": Not yet taken\n";
+  });
+  return rows;
+}
+
+function sendFormspree(subject, sectionName, score, result, counts) {
+  var ts = new Date().toLocaleString("en-US", {
+    weekday:"long", year:"numeric", month:"long",
+    day:"numeric", hour:"numeric", minute:"2-digit"
+  });
+  var body = [
+    "Doctor: " + DR.name,
+    "Email: " + DR.email,
+    "Section: " + sectionName,
+    "Score: " + score + "%",
+    "Result: " + result,
+    "Correct: " + counts,
+    "Time: " + ts,
+    "",
+    "All Scores:",
+    allScoresText()
+  ].join("\n");
+
+  fetch(FORMSPREE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify({
+      _subject: subject,
+      _replyto: DR.email,
+      message:  body,
+      doctor:   DR.name,
+      email:    DR.email,
+      section:  sectionName,
+      score:    score + "%",
+      result:   result
+    })
+  }).catch(function(e) { console.log("Formspree error:", e); });
+}
+
+function emailSectionResult(sectionLabel, correct, total, score, passed) {
+  var result = passed ? "PASSED" : "FAILED - Retake required";
+  var subj   = "[ADA Cert] " + DR.name + " - " + sectionLabel + " " + (passed ? "PASSED" : "FAILED") + " (" + score + "%)";
+  sendFormspree(subj, sectionLabel, score, result, correct + " of " + total);
+}
+
+function emailFinalResult(overallPct, allPassed) {
+  var result = allPassed ? "ALL SECTIONS PASSED - CERTIFIED" : "Incomplete - retake required";
+  var subj   = "[ADA Cert] " + DR.name + " - " + (allPassed ? "CERTIFICATION COMPLETE" : "Incomplete") + " (" + overallPct + "%)";
+  sendFormspree(subj, "FINAL CERTIFICATION", overallPct, result, "See all scores below");
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  var btn = document.getElementById("gate-submit-btn");
+  if (btn) btn.addEventListener("click", startGate);
+  var inp = document.getElementById("g-email");
+  if (inp) inp.addEventListener("keydown", function(e) { if (e.key === "Enter") startGate(); });
+  if (loadDR() && DR.name && DR.email) {
+    var hdr = document.getElementById("hdr-right");
+    if (hdr) hdr.textContent = DR.name;
+    showScreen("s-welcome");
+    renderWelcome();
+  } else {
+    showScreen("s-gate");
+  }
+});
+</script>
 </body>
 </html>
