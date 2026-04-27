@@ -105,16 +105,6 @@ body{font-family:Arial,sans-serif;background:#F1F5F9;color:#0F172A;min-height:10
 @media(max-width:500px){.stats{grid-template-columns:repeat(2,1fr)}.breakdown{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script>
-// ─────────────────────────────────────────────────────────────
-// EMAILJS CONFIG  —  replace the 3 YOUR_... values to activate
-// Full instructions: see the yellow banner when you open the file
-// ─────────────────────────────────────────────────────────────
-const EJS_SVC  = "service_adeux7g";
-const EJS_TPL  = "pu63gn8";
-const EJS_KEY  = "611RAkPeD3wt405mG";
-const ADMIN    = "jay@media.dental";   // results always go here
-</script>
 </head>
 <body>
 <div class="hdr">
@@ -122,66 +112,30 @@ const ADMIN    = "jay@media.dental";   // results always go here
   <div class="hdr-right" id="hdr-right">Doctor Certification Program</div>
 </div>
 <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
-<!-- SETUP BANNER — hides automatically once EmailJS keys are set -->
-<div id="setup-banner" style="display:none">
-  <span>⚠️ <strong>Email delivery not active yet.</strong> Quiz works fully — but results won't email until you complete the 5-minute EmailJS setup.</span>
-  <a href="#" onclick="document.getElementById('setup-steps').style.display=document.getElementById('setup-steps').style.display==='none'?'block':'none';return false" style="color:#B45309;font-weight:700;white-space:nowrap">View setup steps ↓</a>
-</div>
-<div id="setup-steps" style="display:none;background:#FFFBEB;border-bottom:2px solid #F59E0B;padding:1rem 1.25rem;font-size:13px;color:#374151;line-height:1.9">
-  <strong style="display:block;margin-bottom:.5rem">📧 EmailJS Setup — free, takes 15 minutes</strong>
-  <div><strong>Step 1:</strong> Go to <strong>emailjs.com</strong> → sign up free → click <strong>Add New Service</strong> → pick Gmail → sign in with jay@media.dental → click <strong>Connect Account</strong> → copy the <strong>Service ID</strong> shown</div>
-  <div><strong>Step 2:</strong> Click <strong>Email Templates</strong> in the left menu → <strong>Create New Template</strong> → set Subject to: <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px">{{subject}}</code> → set Body to include these variables: <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px">{{doctor_name}} {{doctor_email}} {{section_name}} {{section_score}} {{section_result}} {{correct_count}} {{all_scores}} {{timestamp}}</code> → click <strong>Save</strong> → copy the <strong>Template ID</strong></div>
-  <div><strong>Step 3:</strong> Click <strong>Account</strong> (top right) → <strong>General</strong> → copy your <strong>Public Key</strong></div>
-  <div><strong>Step 4:</strong> Open this HTML file in Notepad (right-click → Open with → Notepad) → press Ctrl+F → search for <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px">YOUR_SERVICE_ID</code> → replace each of the 3 placeholder values with your actual keys → File → Save</div>
-  <div><strong>Step 5:</strong> Re-open the file in your browser. The yellow banner will disappear. Email is now live. ✅</div>
-</div>
-
 
 <div class="wrap">
 
-<!-- GATE SCREEN -->
+<!-- GATE -->
 <div class="screen active" id="s-gate">
   <div class="welcome" style="max-width:460px">
     <div class="logo">🦷</div>
     <h2 style="font-size:20px;margin-bottom:.5rem">Pre-Clinic Doctor Certification</h2>
-    <p style="font-size:13px;color:#64748B;margin-bottom:1.5rem;line-height:1.7">
-      Enter your name and Gmail address before you begin. Your results will be sent automatically to Dr. Jay Gohel when you complete each section and when you finish the full certification.
-    </p>
-    <div id="gate-err" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;color:#991B1B;line-height:1.5"></div>
+    <p style="font-size:13px;color:#64748B;margin-bottom:1.5rem;line-height:1.7">Enter your name and Gmail address to begin. Your results will be automatically emailed to Dr. Jay Gohel when you complete each section.</p>
+    <div id="gate-err" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;color:#991B1B"></div>
     <div style="display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.25rem">
       <div>
         <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:.3rem">Full Name</label>
-        <input id="g-name" type="text" placeholder="Dr. First Last"
-          style="width:100%;padding:.65rem .85rem;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;font-family:Arial,sans-serif;color:#0F172A;background:#fff;outline:none"
-          onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'"
-        />
+        <input id="g-name" type="text" placeholder="Dr. First Last" style="width:100%;padding:.65rem .85rem;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;font-family:Arial,sans-serif;color:#0F172A;background:#fff;outline:none"/>
       </div>
       <div>
-        <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:.3rem">Gmail Address</label>
-        <input id="g-email" type="email" placeholder="yourname@gmail.com"
-          style="width:100%;padding:.65rem .85rem;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;font-family:Arial,sans-serif;color:#0F172A;background:#fff;outline:none"
-          onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'"
-          id="g-email-input"
-        />
-        <div style="font-size:11px;color:#94A3B8;margin-top:.3rem">Use the Gmail address you were given during onboarding</div>
+        <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:.3rem">Email Address</label>
+        <input id="g-email" type="email" placeholder="yourname@gmail.com" style="width:100%;padding:.65rem .85rem;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;font-family:Arial,sans-serif;color:#0F172A;background:#fff;outline:none"/>
       </div>
     </div>
-    <button id="gate-btn" style="width:100%;padding:.75rem;background:#4338CA;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif">
-      Start Certification →
-    </button>
-    <p style="font-size:11px;color:#94A3B8;margin-top:.85rem;text-align:center;line-height:1.6">
-      Your results are automatically emailed to Dr. Jay Gohel and to your Gmail when you finish.
-    </p>
+    <button id="gate-submit-btn" style="width:100%;padding:.75rem;background:#4338CA;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif">Start Certification →</button>
+    <p style="font-size:11px;color:#94A3B8;margin-top:.85rem;text-align:center">Results are automatically sent to Dr. Jay Gohel when you finish.</p>
   </div>
 </div>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  var btn = document.getElementById("gate-btn");
-  if(btn) btn.addEventListener("click", function() { gateGo(); });
-  var inp = document.getElementById("g-email-input") || document.getElementById("g-email");
-  if(inp) inp.addEventListener("keydown", function(e){ if(e.key==="Enter") gateGo(); });
-});
-</script>
 
 <!-- WELCOME -->
 <div class="screen" id="s-welcome">
@@ -743,7 +697,7 @@ function showSectionResult() {
 
   STATE.sectionResults[sec.id] = { passed: pass, score: pct, correct, total: qs.length };
   saveState();
-  emailSectionResult(sec.label, correct, qs.length, pct, pass);
+  if(typeof emailSectionResult !== 'undefined') emailSectionResult(sec.label, correct, qs.length, pct, pass);
 
   showScreen("s-secresult");
   document.getElementById("prog-bar").style.width = ((STATE.sectionIdx + 1) / SECTIONS.length * 100) + "%";
@@ -867,7 +821,9 @@ function showFinal() {
     </div>`;
   });
   document.getElementById("f-breakdown").innerHTML = bdHtml;
-  emailFinalResult(overallPct, allPassed);
+  var tc=0,tq=0; SECTIONS.forEach(function(s){var r=STATE.sectionResults[s.id];if(r){tc+=r.correct;tq+=r.total;}});
+  var op=Math.round((tc/tq)*100); var ap=SECTIONS.every(function(s){return STATE.sectionResults[s.id]&&STATE.sectionResults[s.id].passed;});
+  if(typeof emailFinalResult !== "undefined") emailFinalResult(op, ap);
 }
 
 // ═══════════════════════════════════════════════
@@ -886,99 +842,141 @@ function retakeQuiz() {
   renderWelcome();
 }
 
+// INIT - handled by DOMContentLoaded above
+</script>
 
-// ══════════════════════════════════════════════════════════
-// DOCTOR IDENTITY
-// ══════════════════════════════════════════════════════════
-let DR = { name:"", email:"" };
+<script>
+// ── CONFIG ──────────────────────────────────
+var EJS_SVC  = "service_adeux7g";
+var EJS_TPL  = "pu63gn8";
+var EJS_KEY  = "611RAkPeD3wt405mG";
+var ADMIN    = "jay@media.dental";
+
+// ── DOCTOR IDENTITY ─────────────────────────
+var DR = { name:"", email:"" };
+
 function loadDR() {
   try {
-    const d = JSON.parse(localStorage.getItem(STORE_KEY+"_dr"));
-    if(d&&d.name&&d.email){DR=d;return true;}
-  } catch(e){}
+    var d = JSON.parse(localStorage.getItem("ada_dr_v1"));
+    if (d && d.name && d.email) { DR = d; return true; }
+  } catch(e) {}
   return false;
 }
-function saveDR(){ localStorage.setItem(STORE_KEY+"_dr", JSON.stringify(DR)); }
 
-// ══════════════════════════════════════════════════════════
-// GATE LOGIC
-// ══════════════════════════════════════════════════════════
-function gateGo() {
-  const name  = (document.getElementById("g-name").value||"").trim();
-  const email = (document.getElementById("g-email").value||"").trim().toLowerCase();
-  const err   = document.getElementById("gate-err");
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if(!name)  { err.textContent="Please enter your full name."; err.style.display="block"; return; }
-  if(!email||!emailOk) { err.textContent="Please enter a valid Gmail address."; err.style.display="block"; return; }
-  err.style.display="none";
-  DR = { name, email };
-  saveDR();
-  emailjs.init(EJS_KEY);
-  document.getElementById("hdr-right").textContent = name;
-  showScreen("s-welcome");
-  renderWelcome();
-  // Auto-proceed to quiz
-  setTimeout(function(){ beginOrResume(); }, 100);
+function saveDR() {
+  try { localStorage.setItem("ada_dr_v1", JSON.stringify(DR)); } catch(e) {}
 }
 
-// ══════════════════════════════════════════════════════════
-// EMAIL HELPERS
-// ══════════════════════════════════════════════════════════
+// ── GATE ─────────────────────────────────────
+function startGate() {
+  var name  = (document.getElementById("g-name").value  || "").trim();
+  var email = (document.getElementById("g-email").value || "").trim().toLowerCase();
+  var err   = document.getElementById("gate-err");
+
+  if (!name) {
+    err.textContent = "Please enter your full name.";
+    err.style.display = "block";
+    return;
+  }
+  if (!email || email.indexOf("@") === -1 || email.indexOf(".") === -1) {
+    err.textContent = "Please enter a valid email address.";
+    err.style.display = "block";
+    return;
+  }
+
+  err.style.display = "none";
+  DR.name  = name;
+  DR.email = email;
+  saveDR();
+
+  try { emailjs.init(EJS_KEY); } catch(e) { console.log("EmailJS init:", e); }
+
+  // Update header
+  var hdr = document.getElementById("hdr-right");
+  if (hdr) hdr.textContent = name;
+
+  // Go to welcome then immediately begin
+  showScreen("s-welcome");
+  renderWelcome();
+  setTimeout(function() { beginOrResume(); }, 200);
+}
+
+// ── EMAIL ─────────────────────────────────────
 function allScoresText() {
-  return SECTIONS.map(sec => {
-    const r = STATE.sectionResults[sec.id];
-    return r ? sec.label+": "+r.correct+"/"+r.total+" ("+r.score+"%) — "+(r.passed?"PASSED":"FAILED") : sec.label+": Not yet taken";
-  }).join("\n");
+  var rows = "";
+  SECTIONS.forEach(function(sec) {
+    var r = STATE.sectionResults[sec.id];
+    rows += r
+      ? sec.label + ": " + r.correct + "/" + r.total + " (" + r.score + "%) — " + (r.passed ? "PASSED" : "FAILED") + "\n"
+      : sec.label + ": Not yet taken\n";
+  });
+  return rows;
 }
 
 function sendEmail(toEmail, subj, sectionName, score, result, counts) {
-  // EmailJS configured
-  const ts = new Date().toLocaleString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"});
-  emailjs.send(EJS_SVC, EJS_TPL, {
-    to_email:      toEmail,
-    doctor_name:   DR.name,
-    doctor_email:  DR.email,
-    section_name:  sectionName,
-    section_score: score+"%",
-    section_result:result,
-    correct_count: counts,
-    all_scores:    allScoresText(),
-    timestamp:     ts,
-    subject:       subj
-  }).catch(e=>console.warn("EmailJS error:",e));
+  try {
+    var ts = new Date().toLocaleString("en-US", {
+      weekday:"long", year:"numeric", month:"long",
+      day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"
+    });
+    emailjs.send(EJS_SVC, EJS_TPL, {
+      to_email:       toEmail,
+      doctor_name:    DR.name,
+      doctor_email:   DR.email,
+      section_name:   sectionName,
+      section_score:  score + "%",
+      section_result: result,
+      correct_count:  counts,
+      all_scores:     allScoresText(),
+      timestamp:      ts,
+      subject:        subj
+    });
+  } catch(e) { console.log("Email error:", e); }
 }
 
 function emailSectionResult(sectionLabel, correct, total, score, passed) {
-  const result = passed ? "PASSED ✅" : "FAILED ❌ — Retake required";
-  const subj   = "[ADA Cert] "+DR.name+" — "+sectionLabel+" "+(passed?"PASSED":"FAILED")+" ("+score+"%)";
-  const counts = correct+" of "+total+" correct";
+  var result = passed ? "PASSED" : "FAILED - Retake required";
+  var subj   = "[ADA Cert] " + DR.name + " - " + sectionLabel + " " + (passed ? "PASSED" : "FAILED") + " (" + score + "%)";
+  var counts = correct + " of " + total + " correct";
   sendEmail(ADMIN,     subj, sectionLabel, score, result, counts);
   sendEmail(DR.email,  subj, sectionLabel, score, result, counts);
 }
 
 function emailFinalResult(overallPct, allPassed) {
-  const result = allPassed ? "ALL SECTIONS PASSED — CERTIFIED ✅" : "Not all sections passed — retake required";
-  const subj   = "[ADA Cert] "+DR.name+" — "+(allPassed?"CERTIFICATION COMPLETE ✅":"Incomplete")+" ("+overallPct+"%)";
+  var result = allPassed ? "ALL SECTIONS PASSED - CERTIFIED" : "Incomplete - retake required";
+  var subj   = "[ADA Cert] " + DR.name + " - " + (allPassed ? "CERTIFICATION COMPLETE" : "Incomplete") + " (" + overallPct + "%)";
   sendEmail(ADMIN,    subj, "FINAL CERTIFICATION", overallPct, result, "See all scores below");
   sendEmail(DR.email, subj, "FINAL CERTIFICATION", overallPct, result, "See all scores below");
 }
 
-// Hide setup banner if already configured
-window.addEventListener("DOMContentLoaded", function() {
-  if(true) {
-    ["setup-banner","setup-steps"].forEach(id=>{ const el=document.getElementById(id); if(el)el.style.display="none"; });
+// ── WIRE UP BUTTON AFTER DOM LOADS ───────────
+document.addEventListener("DOMContentLoaded", function() {
+  // Wire gate button
+  var btn = document.getElementById("gate-submit-btn");
+  if (btn) {
+    btn.addEventListener("click", startGate);
   }
-  // Restore returning doctor
-  if(loadDR()) {
-    emailjs.init(EJS_KEY);
-    document.getElementById("hdr-right").textContent = DR.name;
+
+  // Wire enter key on email field
+  var emailInput = document.getElementById("g-email");
+  if (emailInput) {
+    emailInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") startGate();
+    });
+  }
+
+  // Check if returning user
+  if (loadDR() && DR.name && DR.email) {
+    try { emailjs.init(EJS_KEY); } catch(e) {}
+    var hdr = document.getElementById("hdr-right");
+    if (hdr) hdr.textContent = DR.name;
     showScreen("s-welcome");
     renderWelcome();
+  } else {
+    showScreen("s-gate");
   }
 });
-
-// INIT
-if(!loadDR()){ showScreen("s-gate"); } else { renderWelcome(); }
 </script>
+
 </body>
 </html>
